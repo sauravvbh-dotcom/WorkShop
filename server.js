@@ -1,18 +1,57 @@
-const express = require('express');
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const app = express();
 
-app.use(express.json());
+const filePath = path.join(__dirname, "db.json");
 
-app.get('/products', (req, res) => {
-    res.send('Hello, World!');
+function readFile() {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, "utf-8", (err, data) => {
+            if (err) return reject(err);
+            try {
+                resolve(JSON.parse(data));
+            } catch (parseErr) {
+                reject(parseErr);
+            }
+        });
+    });
+}
+
+async function readFiledelay() {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    let products = await readFile();
+    return products;
+}
+
+app.get("/products", async (req, res) => {
+    try {
+        const data = await readFiledelay();
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error reading file" });
+    }
 });
 
-app.post('/products/:id', (req, res) => {
-    const product = req.body;
-    res.status(201).send(`Product created: ${JSON.stringify(product)}`);
-});
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-}); 
+app.get("/products/:id", async (req, res) => {
+    try {
+        const data = await readFile();
+        const productId = Number(req.params.id);
 
+        const product = data.find((p) => p.id === productId);
+
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        res.json(product);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error reading file" });
+    }
+});
+
+app.listen(3000, () => {
+    console.log("Server running on port 3000");
+});
