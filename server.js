@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const { cache } = require("react");
 const app = express();
 
 const filePath = path.join(__dirname, "db.json");
@@ -26,7 +27,13 @@ async function readFiledelay() {
 
 app.get("/products", async (req, res) => {
     try {
+        let key = req.url;
+        let value= cache.get(key);
+        if(value){
+            return res.json(value);
+        }
         const data = await readFiledelay();
+        cache[key] = data;
         res.json(data);
     } catch (err) {
         console.error(err);
