@@ -3,9 +3,13 @@ const {
     getProductById
 } = require("../services/productService");
 
+const { cache } = require("../middleware/cacheMiddleware");
+
 async function getAllProducts(req, res) {
     try {
         const products = await getProducts();
+
+        cache[req.cacheKey] = products;
 
         res.json(products);
     } catch (err) {
@@ -24,6 +28,8 @@ async function getSingleProduct(req, res) {
                 error: "Product not found"
             });
         }
+
+        cache[req.cacheKey] = product;
 
         res.json(product);
     } catch (err) {

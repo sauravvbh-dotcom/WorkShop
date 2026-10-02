@@ -5,10 +5,22 @@ const {
     getSingleProduct
 } = require("../controllers/productController");
 
+const {
+    cacheMiddleware
+} = require("../middleware/cacheMiddleware");
+
 const router = express.Router();
 
-router.get("/products", getAllProducts);
+router.get(
+    "/products",
+    cacheMiddleware,
+    getAllProducts
+);
 
-router.get("/products/:id", getSingleProduct);
+router.get(
+    "/products/:id",
+    cacheMiddleware,
+    getSingleProduct
+);
 
 module.exports = router;
