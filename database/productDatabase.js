@@ -13,6 +13,19 @@ function readProducts() {
     }
 }
 
+function writeProducts(products) {
+    try {
+        fs.writeFileSync(
+            filePath,
+            JSON.stringify(products, null, 2)
+        );
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
 module.exports = {
-    readProducts
+    readProducts,
+    writeProducts
 };

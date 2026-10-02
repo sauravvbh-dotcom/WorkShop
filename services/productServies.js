@@ -1,4 +1,7 @@
-const { readProducts } = require("../database/productDatabase");
+const {
+    readProducts,
+    writeProducts
+} = require("../database/productDatabase");
 
 async function getProducts() {
     await new Promise((resolve) => {
@@ -15,14 +18,67 @@ async function getProductById(id) {
 
     const products = readProducts();
 
-    const product = products.find(
+    return products.find(
         (p) => p.id === Number(id)
     );
+}
+
+function createProduct(product) {
+    const products = readProducts();
+
+    products.push(product);
+
+    writeProducts(products);
 
     return product;
 }
 
+function updateProduct(id, updatedProduct) {
+    const products = readProducts();
+
+    const index = products.findIndex(
+        (p) => p.id === Number(id)
+    );
+
+    if (index === -1) {
+        return null;
+    }
+
+    products[index] = {
+        ...products[index],
+        ...updatedProduct,
+        id: Number(id)
+    };
+
+    writeProducts(products);
+
+    return products[index];
+}
+
+function deleteProduct(id) {
+    const products = readProducts();
+
+    const index = products.findIndex(
+        (p) => p.id === Number(id)
+    );
+
+    if (index === -1) {
+        return null;
+    }
+
+    const deletedProduct = products[index];
+
+    products.splice(index, 1);
+
+    writeProducts(products);
+
+    return deletedProduct;
+}
+
 module.exports = {
     getProducts,
-    getProductById
+    getProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct
 };

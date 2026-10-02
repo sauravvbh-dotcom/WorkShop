@@ -20,7 +20,16 @@ function cacheMiddleware(req, res, next) {
     next();
 }
 
+function clearCache() {
+    Object.keys(cache).forEach((key) => {
+        delete cache[key];
+    });
+
+    console.log("CACHE CLEARED");
+}
+
 module.exports = {
     cache,
-    cacheMiddleware
+    cacheMiddleware,
+    clearCache
 };
